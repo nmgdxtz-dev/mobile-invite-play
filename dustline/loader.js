@@ -21,8 +21,8 @@
   const aes=await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['decrypt']);
   const data=await crypto.subtle.decrypt({name:'AES-GCM',iv:packed.slice(0,12)},aes,packed.slice(12));packed=null;
   const stream=new Blob([data]).stream().pipeThrough(new DecompressionStream('gzip'));
-  const html=await new Response(stream).text();
+  let html=await new Response(stream).text();const base=document.createElement('base');base.href=new URL('./',location.href).href;html=html.replace('<head>','<head>'+base.outerHTML);
   try{localStorage.setItem(save,key);}catch{}
-  document.open();document.write(html);document.close();
+  const frame=document.createElement('iframe');frame.title='游戏试玩';frame.allow='autoplay; fullscreen';frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:0;display:block;background:#11152d';document.documentElement.style.cssText='width:100%;height:100%;overflow:hidden';document.body.style.cssText='margin:0;width:100%;height:100%;overflow:hidden';frame.srcdoc=html;document.body.replaceChildren(frame);
  }catch(e){status.textContent=e.message==='browser'?'请更新 Safari 后重试':'暂时无法打开试玩';detail.textContent=e.message==='browser'?'此试玩需要支持网页解密和解压的较新浏览器。':e.name==='OperationError'||e.message==='invite'?'邀请链接不完整或已失效，请重新打开完整链接。':'下载失败，请检查网络后刷新。';form.hidden=false;}
 })();

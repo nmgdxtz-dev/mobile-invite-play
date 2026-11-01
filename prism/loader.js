@@ -11,7 +11,7 @@
   if(!crypto.subtle||!window.DecompressionStream)throw Error('browser');
   if(!/^[A-Za-z0-9_-]{43}$/.test(key))throw Error('invite');
   status.textContent='正在加载试玩';detail.textContent='首次加载稍久，请保持此页面打开…';
-  const response=await fetch('game-2da6c26fc83af84c.bin',{cache:'force-cache'});if(!response.ok)throw Error('network');
+  const response=await fetch('game-74c41af42f7cfed6.bin',{cache:'force-cache'});if(!response.ok)throw Error('network');
   const total=Number(response.headers.get('content-length')),reader=response.body?.getReader();let packed;
   if(reader){let chunks=[],length=0;for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);length+=value.length;detail.textContent=`已下载 ${(length/1048576).toFixed(1)} MB${total?' / '+(total/1048576).toFixed(1)+' MB':''}，请稍候…`;}
    packed=new Uint8Array(length);let offset=0;for(const c of chunks){packed.set(c,offset);offset+=c.length;}chunks=null;
@@ -21,8 +21,8 @@
   const aes=await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['decrypt']);
   const data=await crypto.subtle.decrypt({name:'AES-GCM',iv:packed.slice(0,12)},aes,packed.slice(12));packed=null;
   const stream=new Blob([data]).stream().pipeThrough(new DecompressionStream('gzip'));
-  const html=await new Response(stream).text();
+  let html=await new Response(stream).text();const base=document.createElement('base');base.href=new URL('./',location.href).href;html=html.replace('<head>','<head>'+base.outerHTML);
   try{localStorage.setItem(save,key);}catch{}
-  document.open();document.write(html);document.close();
+  const frame=document.createElement('iframe');frame.title='游戏试玩';frame.allow='autoplay; fullscreen';frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:0;display:block;background:#11152d';document.documentElement.style.cssText='width:100%;height:100%;overflow:hidden';document.body.style.cssText='margin:0;width:100%;height:100%;overflow:hidden';frame.srcdoc=html;document.body.replaceChildren(frame);
  }catch(e){status.textContent=e.message==='browser'?'请更新 Safari 后重试':'暂时无法打开试玩';detail.textContent=e.message==='browser'?'此试玩需要支持网页解密和解压的较新浏览器。':e.name==='OperationError'||e.message==='invite'?'邀请链接不完整或已失效，请重新打开完整链接。':'下载失败，请检查网络后刷新。';form.hidden=false;}
 })();
