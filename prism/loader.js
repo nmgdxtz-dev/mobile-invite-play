@@ -10,7 +10,7 @@
   try{
    if(!crypto.subtle||!window.DecompressionStream)throw Error('browser');
    status.textContent='正在加载试玩';detail.textContent='首次下载稍久，请保持页面打开。下载失败可以直接重试。';
-   const response=await fetch('game-e38f846da1f1f833.bin',{cache:'force-cache'});if(!response.ok)throw Error('network');
+   const response=await fetch('game-9833b4e17a4dbece.bin',{cache:'force-cache'});if(!response.ok)throw Error('network');
    const total=Number(response.headers.get('content-length')),reader=response.body?.getReader();let packed;
    if(reader){let chunks=[],length=0;for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);length+=value.length;detail.textContent=`已下载 ${(length/1048576).toFixed(1)} MB${total?' / '+(total/1048576).toFixed(1)+' MB':''}，请稍候…`;}
     packed=new Uint8Array(length);let offset=0;for(const c of chunks){packed.set(c,offset);offset+=c.length;}chunks=null;
